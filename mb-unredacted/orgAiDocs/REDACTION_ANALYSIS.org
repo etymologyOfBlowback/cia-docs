@@ -1,0 +1,86 @@
+#+TITLE: Iran CIA Document Redaction Analysis
+#+AUTHOR: Redaction Detection System
+#+DATE: 2026-02-20
+#+OPTIONS: toc:t
+
+* Summary
+
+This analysis combines two detection methods:
+1. *Vector Redactions*: Transparent overlays in PDF structure (can be extracted)
+2. *Black Redactions*: Physical scanned/photographed boxes (cannot be removed)
+
+* Analysis Table
+
+| PDF File       | Vector Redactions               | Black Redactions                     | Status              | Notes                                                           |
+|----------------+---------------------------------+--------------------------------------+---------------------+-----------------------------------------------------------------|
+| appendix-a.pdf | None                            | None                                 | ✓ UNREDACTED        | Fully readable - no redactions                                  |
+| appendix-b.pdf | None                            | None                                 | ✓ UNREDACTED        | Fully readable - no redactions                                  |
+| appendix-c.pdf | None                            | None                                 | ✓ UNREDACTED        | Fully readable - no redactions                                  |
+| appendix-d.pdf | YES: 15 pages, 78.9%, 133 boxes | Minor: 1 page, 5.3%, 1 box           | ⚠ RECOVERABLE       | Vector redactions can be extracted; minimal physical redactions |
+| appendix-e.pdf | None                            | Minor: 1 page, 4.0%, 1 box           | ✓ MOSTLY UNREDACTED | Only 1 minimal black box                                        |
+| intro.pdf      | None                            | None                                 | ✓ UNREDACTED        | Fully readable - no redactions                                  |
+| main.1.pdf     | None                            | None                                 | ✓ UNREDACTED        | Fully readable - no redactions                                  |
+| main.2.pdf     | None                            | Minor: 1 page, 12.5%, 1 box          | ✓ MOSTLY UNREDACTED | Only 1 minimal black box                                        |
+| main.3.pdf     | None                            | None                                 | ✓ UNREDACTED        | Fully readable - no redactions                                  |
+| main.4.pdf     | None                            | None                                 | ✓ UNREDACTED        | Fully readable - no redactions                                  |
+| main.5.pdf     | None                            | Significant: 7 pages, 38.9%, 9 boxes | ✗ REDACTED          | Multiple physical redactions - cannot be recovered              |
+| main.6.pdf     | None                            | Significant: 3 pages, 50%, 6 boxes   | ✗ REDACTED          | Multiple physical redactions - cannot be recovered              |
+| main.7.pdf     | YES: 14 pages, 63.6%, 45 boxes  | None                                 | ⚠ RECOVERABLE       | Vector redactions can be extracted; no physical redactions      |
+| main.8.pdf     | YES: 10 pages, 71.4%, 45 boxes  | Minor: 2 pages, 14.3%, 2 boxes       | ⚠ RECOVERABLE       | Vector redactions can be extracted; some physical redactions    |
+| main.9.pdf     | None                            | Minor: 1 page, 12.5%, 1 box          | ✓ MOSTLY UNREDACTED | Only 1 minimal black box                                        |
+| main.10.pdf    | YES: 1 page, 8.3%, 2 boxes      | Minor: 1 page, 8.3%, 1 box           | ⚠ RECOVERABLE       | Minimal vector redactions and physical redactions               |
+| summary.pdf    | None                            | None                                 | ✓ UNREDACTED        | Fully readable - no redactions                                  |
+
+* Categories
+
+** ✓ UNREDACTED (Fully readable, 0 redactions)
+- appendix-a.pdf
+- appendix-b.pdf
+- appendix-c.pdf
+- appendix-e.pdf (1 minor box but negligible)
+- intro.pdf
+- main.1.pdf
+- main.3.pdf
+- main.4.pdf
+- main.9.pdf (1 minor box but negligible)
+- summary.pdf
+
+*Total: 10 fully unredacted files*
+
+** ⚠ RECOVERABLE (Vector redactions only - can be extracted)
+- appendix-d.pdf → 15 pages of vector redactions (133 boxes) → *Highest priority for extraction*
+- main.7.pdf → 14 pages of vector redactions (45 boxes)
+- main.8.pdf → 10 pages of vector redactions (45 boxes) + some physical redactions
+- main.10.pdf → 1 page of vector redactions (2 boxes) + some physical redactions
+
+*Total: 4 files with recoverable vector redactions*
+
+** ✗ REDACTED (Physical redactions - cannot be recovered without external sources)
+- main.5.pdf → 7 pages with physical redactions (9 boxes)
+- main.6.pdf → 3 pages with physical redactions (6 boxes) → *Highest redaction density: 50%*
+
+*Total: 2 files with unrecoverable physical redactions*
+
+* Recovery Strategy
+
+| Category | Files | Action Required | Priority |
+|---|---|---|---|
+| Unredacted | 10 files | None - use as-is | Low |
+| Recoverable (Vector) | 4 files | Extract vector redactions using image stream extraction | HIGH |
+| Unrecoverable (Physical) | 2 files | Search external sources (NSArchive, CIA FOIA) | HIGH |
+
+* Next Steps
+
+1. Extract vector redactions from 4 recoverable files
+   - main.7.pdf (14 pages)
+   - main.8.pdf (10 pages)
+   - appendix-d.pdf (15 pages - MOST IMPORTANT)
+   - main.10.pdf (1 page)
+
+2. Search web for unredacted versions of physical redaction files
+   - main.5.pdf
+   - main.6.pdf
+
+3. OCR all extracted content to create searchable text corpus
+
+4. Cross-reference with NSArchive and CIA FOIA releases

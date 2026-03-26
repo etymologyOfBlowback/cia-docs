@@ -1,0 +1,159 @@
+#+TITLE: Web Search Results - Iran 1953 Coup Unredacted Documents
+#+AUTHOR: GitHub Copilot
+#+DATE: February 20, 2026
+
+* Search Summary
+
+Searched for unredacted versions of Iran 1953 coup CIA documents. Found several promising leads:
+
+* Key Resources Found
+
+** 1. National Security Archive (NSArchive)
+   - URL: https://nsarchive.gwu.edu/
+   - Status: HIGHLY RELEVANT
+   - Reference: "New documentary film on 1953 coup in Iran features declassified documents from Archive collection" (Oct 15, 2019)
+   - Action: Search their Virtual Reading Room for Iran 1953 materials
+   - Collections: Over 100,000 declassified documents available
+
+** 2. CIA FOIA Electronic Reading Room
+   - URL: https://www.cia.gov/readingroom/
+   - Status: PRIMARY SOURCE
+   - Collections: Historical collections of declassified CIA documents
+   - Action: Search for "Iran 1953", "Operation Ajax", "TPAJAX"
+   - Available: Free public access to many documents
+
+** 3. Digital National Security Archive (DNSA)
+   - URL: https://nsarchive.gwu.edu/digital-national-security-archive
+   - Status: SUBSCRIPTION REQUIRED (check university access)
+   - Content: 100,000+ declassified records
+   - Coverage: Cold War, intelligence operations, Iran coup likely included
+
+* Search Strategies
+
+** Direct Search Terms to Try:
+- "Operation Ajax" (US codename)
+- "Operation TPAJAX" (combined US-UK codename)
+- "Iran 1953 coup" OR "1953 Iranian coup"
+- "Mohammad Mosadegh" OR "Mossadeq"
+- "Kermit Roosevelt" (CIA operative who led operation)
+- "Shah Mohammad Reza Pahlavi"
+- "August 1953" AND "Tehran"
+
+** Archive-Specific Searches:
+- NSArchive Virtual Reading Room: Search for "Iran 1953"
+- CIA Readingroom: Browse "Historical Collections" or use advanced search
+- Search for specific officer names found in your OCR (even if redacted)
+- Search for specific dates and locations from your documents
+
+* What Unredacted Versions Would Show
+
+If found, unredacted documents would reveal:
+
+1. **Officer Names** - Currently showing as blanks
+2. **Operational Details** - Specific plans and tactics
+3. **Personnel Roles** - Who did what in the coup
+4. **Communication Channels** - How CIA coordinated with other agencies
+5. **Local Collaborators** - Iranian officers/officials involved
+6. **Budget/Resources** - How much was spent
+7. **Success/Failure Factors** - Why it succeeded
+
+* Known Publicly Available Information
+
+The 1953 Iran coup is historical fact and partially declassified:
+
+- Kermit Roosevelt led the operation (now public knowledge)
+- US and UK governments jointly planned it (acknowledged)
+- Shah was restored to power (public record)
+- Mosadegh was overthrown (historical fact)
+- Operation was initially called "Operation Ajax" then "TPAJAX"
+- The coup succeeded on August 19, 1953
+
+* Recommended Next Steps
+
+1. **Check University/Library Access**
+   - DNSA often available through university subscriptions
+   - Try George Washington University library access
+   - Check ProQuest DNSA database
+
+2. **Search NSArchive Directly**
+   - Go to https://nsarchive.gwu.edu/virtual-reading-room
+   - Search for "Iran 1953"
+   - Look for any "Briefing Books" on Iran coup
+
+3. **Contact CIA FOIA**
+   - Submit FOIA request for unredacted versions
+   - Reference: Iran 1953 coup documents
+   - Note which specific sections are redacted in your files
+
+4. **Academic Sources**
+   - Search Google Scholar for Iran 1953 coup declassified documents
+   - Check university press releases about documentaries
+   - Look for books with reproduced declassified documents
+
+5. **Cross-Reference**
+   - Your document mentions specific officers and dates
+   - Search those officer names in combination with "Iran 1953"
+   - May find related documents with different redaction patterns
+
+* Key Document Components
+
+Your redacted documents mention:
+
+- "The precise order of events of the night of 15 August 1953"
+- General Taghi Riahi (mentioned, probably NOT redacted - he's documented)
+- 1st Armored Brigades
+- Bagh-i-Shah (army barracks)
+- Shin ran (neighborhood mentioned)
+- Pro-shah soldiers
+- Specific timeline with hours (2000, 2230, 2300 hours)
+
+**Research Strategy**: Search for sources about these specific units, locations, and times. Cross-references in other historical accounts might fill in the redacted names.
+
+* Historical Context Sources
+
+These sources have extensively documented the 1953 coup:
+
+1. **Kermit Roosevelt's Memoir** - "Countercoup: The Struggle for the Control of Iran" (1979)
+   - Written by the CIA officer who led the operation
+   - Contains officer names and operational details
+
+2. **Mark Gasiorowski's Work** - "U.S. Foreign Policy and the Shah"
+   - Academic analysis with declassified document references
+   - Lists many unredacted names and details
+
+3. **Stephen Kinzer's Book** - "All the Shah's Men" (2003)
+   - Popular history with extensive CIA document quotes
+   - Contains many details from declassified materials
+
+4. **National Security Archive Briefing Books**
+   - Likely have Iran 1953 materials
+   - Usually include complete declassified documents with minimal redactions
+
+* Expected Outcomes
+
+If you find unredacted versions, they will likely show:
+
+- Full names of CIA officers (Kermit Roosevelt at minimum)
+- Iranian military officers and government officials
+- Specific operational units and codenames
+- Timeline and sequence of events (already partially visible in your OCR)
+- Communication with British intelligence (MI6)
+- Details about which officers were "witting" vs "unwitting"
+
+* Status Summary
+
+✓ Highly relevant archive found (NSArchive)
+✓ Primary source repository confirmed (CIA FOIA)
+✓ Search strategies identified
+✓ Your OCR has valuable context clues (names, dates, locations)
+⚠ No direct links to fully unredacted main.6 found yet
+⚠ Some documents may still be partially redacted even in "official" releases
+
+* Next Action
+
+1. Visit NSArchive Virtual Reading Room: https://nsarchive.gwu.edu/virtual-reading-room
+2. Search for: "Iran 1953" OR "Operation Ajax"
+3. Look for Briefing Books and document collections
+4. Cross-reference with officer/location names from your OCR
+5. Report back with findings
+

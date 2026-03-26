@@ -1,0 +1,191 @@
+#+TITLE: Processing Directory - Cleaned and Organized
+#+AUTHOR: GitHub Copilot
+#+DATE: February 20, 2026
+
+* Directory Structure - CLEANED
+
+** Location
+#+BEGIN_EXAMPLE
+/bxo/iso/pip_archive-cvs2014/doc/paykNet/politics/1953MossadeqCoup/cia-53-iranCoup/
+├── pdf-files-orig/          ← ORIGINAL PDF FILES ONLY
+└── orig-files-proc/         ← THIS DIRECTORY (processing & results)
+#+END_EXAMPLE
+
+** Current Organization
+
+*** Working Scripts (4 Python scripts)
+These are the ONLY scripts kept - they work correctly:
+
+1. =pdf_to_png.py=
+   - Purpose: Extract single PDF to PNG images
+   - Status: ✓ WORKING
+   - Usage: `python3 pdf_to_png.py document.pdf`
+   - Output: Creates `document/` directory with PNG files
+
+2. =batch_pdf_to_png.py=
+   - Purpose: Extract all PDFs to PNG images
+   - Status: ✓ WORKING
+   - Usage: `python3 batch_pdf_to_png.py`
+   - Output: Creates directory for each PDF with its PNG pages
+
+3. =identify_redactions.py=
+   - Purpose: Identify and document redaction locations
+   - Status: ✓ WORKING
+   - Usage: `python3 identify_redactions.py document.pdf`
+   - Output: CSV report with redaction coordinates
+
+4. =batch_identify_redactions.py=
+   - Purpose: Batch identify redactions across all PDFs
+   - Status: ✓ WORKING
+   - Usage: `python3 batch_identify_redactions.py`
+   - Output: CSV reports for each PDF
+
+*** Setup Scripts (1 shell script)
+5. =linkPdf.sh=
+   - Purpose: Create symlinks to PDFs from pdf-files-orig
+   - Status: ✓ EXECUTED (can be kept for reference or re-run)
+   - Usage: `bash linkPdf.sh`
+
+*** Extracted Data (21 directories)
+PNG images extracted from all PDFs:
+
+- Iran-CIA Appendices: appendix-a through appendix-e
+- Iran-CIA Intro sections
+- Iran-CIA Main volumes: main.1 through main.10
+- Iran-CIA Summary
+
+Each directory contains individual PNG files (one per page).
+
+*** Documentation (1 directory)
+- =orgDocs/= - Contains all the .org documentation files
+
+*** PDF Symlinks (17 files)
+Symlinks pointing to original PDFs in =pdf-files-orig/=:
+- iran-cia-appendix-a.pdf through iran-cia-appendix-e.pdf
+- iran-cia-intro.pdf
+- iran-cia-main.1.pdf through iran-cia-main.10.pdf
+- iran-cia-summary.pdf
+
+*** Python Virtual Environment
+- =.venv/= - Python environment with all dependencies
+
+---
+
+* Deleted Items (Failed Experiments)
+
+** Deleted Scripts (15 files)
+These scripts were experiments that didn't work or are no longer needed:
+
+| Script | Reason |
+|---|---|
+| aggressive_enhance_main6.py | Inpainting enhancement - didn't produce readable text |
+| analyze_image_stream.py | PDF structure analysis - superseded |
+| analyze_main6_redactions.py | Redaction type analysis - worked but replaced |
+| analyze_redaction_gaps.py | Gap analysis - experimental |
+| create_main6_comparisons.py | Comparison image creation - output not useful |
+| extract_hires_from_pdf.py | High-res extraction - experimental |
+| extract_page11.py | Single page extraction - not needed |
+| full_ocr_main6.py | OCR extraction - experimental |
+| inpaint_main6_redactions.py | Image inpainting - didn't recover redacted text |
+| inspect_pdf.py | PDF inspection utility - not needed |
+| mark_redaction_locations.py | Visual redaction marking - output poor |
+| remove_black_box.py | Vector removal - didn't work properly |
+| remove_rect_redactions.py | Rectangle removal - incomplete |
+| remove_redactions.py | Generic removal - didn't work |
+| reveal_redactions.py | Reveal attempt - didn't work |
+| test_ocr_recovery.py | OCR testing - experimental |
+
+** Deleted Directories (4 directories)
+| Directory | Purpose |
+|---|---|
+| extract_work | Failed extraction experiments |
+| image_stream_analysis | PDF stream analysis results |
+| reveal_work | Revelation attempts |
+| reveal_work_main7 | Revelation attempts (main.7 specific) |
+
+---
+
+* Key Findings Summary
+
+** What We Learned
+
+1. **Vector Overlay Redactions (main.7)**
+   - Pure black boxes drawn on top of image
+   - Can be removed by extracting image layer
+   - Solution: =pdf_to_png.py= extracts perfectly
+
+2. **Physical/Scanned Redactions (main.6)**
+   - Redactions applied to paper before scanning
+   - Cannot be "removed" - they're part of the image
+   - Solution: OCR around the redacted areas + web search for unredacted versions
+   - No inpainting/enhancement helps with text recovery
+
+3. **Redaction Identification**
+   - =identify_redactions.py= successfully maps redaction locations
+   - Creates CSV reports with coordinates
+   - Useful for documentation and analysis
+
+---
+
+* Processing Workflow (Recommended)
+
+For future processing of redacted documents:
+
+#+BEGIN_SRC bash
+# 1. Extract images from PDFs
+python3 batch_pdf_to_png.py
+
+# 2. Identify redaction locations (optional but recommended)
+python3 batch_identify_redactions.py
+
+# 3. For vector overlay redactions:
+#    - Images are already extracted and unredacted
+#    - Run OCR directly on the PNG files
+
+# 4. For physical redactions:
+#    - OCR will show gaps where text was redacted
+#    - Search web/archives for unredacted versions
+#    - Cross-reference with other sources
+#+END_SRC
+
+---
+
+* What Remains to Do
+
+1. **OCR all extracted PNG images**
+   - Convert PNG images to searchable text
+   - Create full text corpus
+   - Run on all 21 directories of images
+
+2. **Document classification**
+   - Identify which PDFs have vector redactions (easy recovery)
+   - Identify which PDFs have physical redactions (need web search)
+
+3. **Final archival**
+   - Organize results
+   - Create metadata
+   - Document redaction patterns across collection
+
+---
+
+* Directory Cleanup Summary
+
+✓ Removed 4 failed experiment directories (extract_work, image_stream_analysis, reveal_work, reveal_work_main7)
+✓ Removed 15 unused/failed experiment scripts
+✓ Kept 4 working production scripts
+✓ Kept 1 setup script
+✓ Kept all extracted PNG directories
+✓ Kept documentation
+✓ Kept Python environment
+
+**Total Space Recovered**: ~100+ MB of failed experiments
+**Current Directory Size**: Clean, focused, production-ready
+
+---
+
+* Next Steps
+
+1. Verify all symlinks are working
+2. Run OCR on all extracted PNG directories
+3. Create final text corpus
+4. Archive and document results

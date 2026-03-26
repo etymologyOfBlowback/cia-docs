@@ -1,0 +1,211 @@
+#+TITLE: PDF to PNG Extraction - Usage Guide
+#+AUTHOR: GitHub Copilot
+#+DATE: February 20, 2026
+
+* Overview
+
+Two Python scripts for extracting PDF pages as PNG images, designed specifically for preparing the iran-cia-*.pdf documents for OCR processing.
+
+* Files
+
+| Script | Purpose |
+|---|---|
+| =pdf_to_png.py= | Convert single PDF to PNG (one page per file) |
+| =batch_pdf_to_png.py= | Convert multiple PDFs in batch |
+
+* Usage
+
+** Single PDF Conversion
+
+Convert a single PDF file to PNG images:
+
+#+BEGIN_SRC bash
+python3 pdf_to_png.py inFile.pdf
+#+END_SRC
+
+**What it does:**
+1. Creates a directory named =inFile= (same name as PDF, without .pdf extension)
+2. Extracts each page as a separate PNG file
+3. Names them: =page_1.png=, =page_2.png=, etc.
+
+**Example:**
+
+#+BEGIN_SRC bash
+python3 pdf_to_png.py iran-cia-main.7.pdf
+#+END_SRC
+
+**Output:**
+#+BEGIN_EXAMPLE
+Processing: iran-cia-main.7.pdf
+Output directory: iran-cia-main.7
+
+Total pages: 22
+
+  ✓ Page   1: page_1.png (590x843)
+  ✓ Page   2: page_2.png (590x843)
+  ...
+  ✓ Page  22: page_22.png (607x851)
+
+✓ Complete! PNG files saved to: iran-cia-main.7
+#+END_EXAMPLE
+
+** Batch Conversion
+
+Convert all iran-cia-*.pdf files in the current directory:
+
+#+BEGIN_SRC bash
+python3 batch_pdf_to_png.py
+#+END_SRC
+
+Or specify a directory:
+
+#+BEGIN_SRC bash
+python3 batch_pdf_to_png.py /path/to/pdf/directory
+#+END_SRC
+
+**What it does:**
+1. Finds all =iran-cia-*.pdf= files in the directory
+2. Processes each one using =pdf_to_png.py=
+3. Creates a directory for each PDF
+4. Reports success/failure for each file
+
+**Example output:**
+
+#+BEGIN_EXAMPLE
+Found 17 PDF files to process
+
+======================================================================
+
+[1/17] Processing: iran-cia-appendix-a.pdf
+----------------------------------------------------------------------
+Processing: iran-cia-appendix-a.pdf
+Output directory: iran-cia-appendix-a
+
+Total pages: 3
+
+  ✓ Page   1: page_1.png (590x843)
+  ✓ Page   2: page_2.png (590x843)
+  ✓ Page   3: page_3.png (590x843)
+
+✓ Complete! PNG files saved to: iran-cia-appendix-a
+
+[2/17] Processing: iran-cia-appendix-b.pdf
+...
+
+======================================================================
+
+Summary:
+  Successful: 17
+  Failed: 0
+  Total: 17
+
+✓ All PDFs converted successfully!
+#+END_EXAMPLE
+
+* Output Structure
+
+After running the scripts, the directory structure will look like:
+
+#+BEGIN_EXAMPLE
+pdf-files-orig/
+├── iran-cia-appendix-a.pdf
+├── iran-cia-appendix-a/
+│   ├── page_1.png
+│   ├── page_2.png
+│   └── page_3.png
+├── iran-cia-appendix-b.pdf
+├── iran-cia-appendix-b/
+│   ├── page_1.png
+│   ├── page_2.png
+│   └── ...
+├── iran-cia-main.1.pdf
+├── iran-cia-main.1/
+│   ├── page_1.png
+│   └── ...
+... (and so on for all 17 PDFs)
+#+END_EXAMPLE
+
+* Key Features
+
+** Automatic Directory Creation
+
+- Each PDF gets its own directory automatically
+- Directory name matches the PDF filename (without .pdf extension)
+- Existing directories are preserved (files may be overwritten)
+
+** Image Extraction
+
+- Extracts the underlying image from each PDF page
+- **Important**: This automatically removes all redaction overlays (vector redactions only sit on top of the image in the PDF structure)
+- Saves as PNG format (lossless, ideal for OCR)
+- Each page is a separate file for easier OCR processing
+
+** Error Handling
+
+- Skips pages without images
+- Reports errors but continues processing
+- Provides detailed progress information
+
+** PNG Format Benefits
+
+For OCR processing, PNG is preferred because:
+- Lossless compression (no quality loss)
+- Cleaner text edges for OCR engines
+- Larger file size than JPG, but negligible for archival
+- Better accuracy with Tesseract and other OCR tools
+
+* Next Steps: OCR Processing
+
+Once all PDFs have been converted to PNG images, the next step is to run OCR on the PNG files:
+
+#+BEGIN_SRC bash
+# Example using Tesseract OCR
+tesseract iran-cia-main.7/page_1.png output.txt
+
+# Or batch process
+for dir in iran-cia-*/; do
+  for png in "$dir"/*.png; do
+    tesseract "$png" "${png%.png}.txt"
+  done
+done
+#+END_SRC
+
+* Requirements
+
+- Python 3.6+
+- =pdfplumber= library (for PDF manipulation)
+- =Pillow/PIL= library (for image handling)
+
+Installation:
+
+#+BEGIN_SRC bash
+pip install pdfplumber Pillow
+#+END_SRC
+
+* Troubleshooting
+
+** "No images on this page"
+
+Some PDF pages may not have an image layer. This is rare but can happen with:
+- Text-only PDFs (rare for scanned documents)
+- Pages with only vector graphics
+- Corrupted pages
+
+**Solution:** Check if the page has content by opening the original PDF
+
+** "Error converting to PNG"
+
+The image stream may be in an unsupported format.
+
+**Solution:** Check the PDF metadata to see what image types are embedded
+
+** Script not found
+
+Make sure both =pdf_to_png.py= and =batch_pdf_to_png.py= are in the same directory.
+
+* Additional Notes
+
+- The scripts extract the FIRST image from each page
+- If a page has multiple images, only the primary one is extracted
+- Image quality matches the original PDF (no enhancement or reduction)
+- Processing time: ~1-2 seconds per page on typical hardware

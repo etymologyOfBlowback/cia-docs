@@ -1,0 +1,310 @@
+#+TITLE: Redaction Detection Tool - Complete Guide
+#+AUTHOR: GitHub Copilot
+#+DATE: February 20, 2026
+
+* Overview
+
+The =detect_redactions.py= tool automatically detects whether a PDF or PNG file contains redacted content.
+
+It uses different detection methods depending on file type and redaction method used.
+
+* Quick Start
+
+** Detect a Single PDF
+
+#+BEGIN_SRC bash
+python3 detect_redactions.py document.pdf
+#+END_SRC
+
+** Detect Multiple Files
+
+#+BEGIN_SRC bash
+python3 detect_redactions.py file1.pdf file2.png page_3.png
+#+END_SRC
+
+** Detect All PDFs in Directory
+
+#+BEGIN_SRC bash
+python3 detect_redactions.py ../pdf-files-orig/*.pdf
+#+END_SRC
+
+* Detection Methods
+
+** Method 1: PDF Vector Analysis
+
+*** How It Works
+- Analyzes the PDF's internal structure
+- Looks for black rectangle objects drawn on pages
+- Counts the number of redaction boxes
+- Determines percentage of pages affected
+
+*** What It Detects
+- ✓ Vector overlay redactions (like in main.7)
+- ✓ Black boxes explicitly placed in PDF structure
+- ✗ Physical/scanned redactions (like in main.6)
+
+*** Example Output
+#+BEGIN_EXAMPLE
+File: iran-cia-main.7.pdf
+Type: PDF
+Detection Method: PDF vector analysis
+Status: ✓ REDACTIONS DETECTED
+  Pages with redactions: 14
+  Total redaction boxes: 45
+  Affected pages: 63.6%
+#+END_EXAMPLE
+
+** Method 2: PNG Image Analysis
+
+*** How It Works
+- Reads the PNG image as a grayscale image
+- Finds dark pixels (below threshold)
+- Uses image contours to find concentrated dark regions
+- Distinguishes redactions from regular text artifacts
+
+*** What It Detects
+- ✓ Solid black redaction boxes in scanned images
+- ✓ Dark regions that are larger than typical text
+- ✗ Partially transparent overlays
+- ✗ Color-based redactions
+
+*** Confidence Levels
+- HIGH: 4+ suspicious dark regions found
+- MEDIUM: 1-3 suspicious regions
+- LOW: No suspicious regions but some dark pixels
+
+*** Example Output
+#+BEGIN_EXAMPLE
+File: page_1.png
+Type: PNG/Image
+Detection Method: PNG image analysis
+Status: ✓ REDACTIONS DETECTED
+  Dark pixels: 43595 (5.8%)
+  Suspicious regions: 5
+  Confidence: HIGH
+#+END_EXAMPLE
+
+* Understanding the Results
+
+** Status Codes
+
+| Status | Meaning |
+|---|---|
+| ✓ REDACTIONS DETECTED | File contains redacted content |
+| ✗ No redactions detected | File appears to be unredacted |
+| INCONCLUSIVE | Tool couldn't determine (error occurred) |
+
+** For PDFs
+
+When redactions are detected in a PDF:
+
+- *Pages with redactions*: How many pages have at least one redaction box
+- *Total redaction boxes*: Total number of distinct redaction boxes found
+- *Affected pages*: Percentage of total pages containing redactions
+
+Example: A 22-page PDF with redactions on 14 pages = 63.6% affected
+
+** For PNGs
+
+When redactions are detected in a PNG:
+
+- *Dark pixels*: Total number of pixels darker than threshold
+- *Dark pixel percentage*: What % of the page is dark
+- *Suspicious regions*: Number of concentrated dark areas
+- *Confidence*: How certain the tool is about the detection
+
+Example: HIGH confidence means 4+ large dark regions found
+
+* Practical Examples
+
+** Example 1: Check if PDF has vector redactions
+
+#+BEGIN_SRC bash
+$ python3 detect_redactions.py ../pdf-files-orig/iran-cia-main.7.pdf
+
+Status: ✓ REDACTIONS DETECTED
+  Pages with redactions: 14
+  Total redaction boxes: 45
+  Affected pages: 63.6%
+#+END_SRC
+
+**Interpretation**: This PDF has vector overlay redactions (easy to remove).
+
+** Example 2: Check if PDF has physical redactions
+
+#+BEGIN_SRC bash
+$ python3 detect_redactions.py ../pdf-files-orig/iran-cia-main.6.pdf
+
+Status: ✗ No redactions detected
+#+END_SRC
+
+**Interpretation**: This PDF has physical/scanned redactions (not in PDF structure).
+
+## Example 3: Check extracted PNG pages
+
+#+BEGIN_SRC bash
+$ python3 detect_redactions.py iran-cia-main.6/page_1.png
+
+Status: ✓ REDACTIONS DETECTED
+  Dark pixels: 43595 (5.8%)
+  Suspicious regions: 5
+  Confidence: HIGH
+#+END_SRC
+
+**Interpretation**: The extracted PNG shows redaction artifacts.
+
+* Use Cases
+
+** Use Case 1: Classify Documents
+
+Quickly determine which PDFs have which type of redaction:
+
+#+BEGIN_SRC bash
+#!/bin/bash
+echo "Vector redactions (easy recovery):"
+for pdf in ../pdf-files-orig/*.pdf; do
+  result=$(python3 detect_redactions.py "$pdf" 2>&1)
+  if echo "$result" | grep -q "REDACTIONS DETECTED"; then
+    echo "  $pdf"
+  fi
+done
+
+echo "No vector redactions (physical redactions):"
+for pdf in ../pdf-files-orig/*.pdf; do
+  result=$(python3 detect_redactions.py "$pdf" 2>&1)
+  if ! echo "$result" | grep -q "REDACTIONS DETECTED"; then
+    echo "  $pdf"
+  fi
+done
+#+END_SRC
+
+** Use Case 2: Quality Check After Extraction
+
+Verify that extracted PNG images don't have redactions:
+
+#+BEGIN_SRC bash
+# After running: python3 batch_pdf_to_png.py
+# Check all extracted images
+for dir in iran-cia-*/; do
+  echo "Checking $dir..."
+  python3 detect_redactions.py "$dir"/*.png | grep -E "Status|Confidence"
+done
+#+END_SRC
+
+** Use Case 3: Batch Redaction Survey
+
+Get statistics on redaction across entire document set:
+
+#+BEGIN_SRC bash
+python3 detect_redactions.py ../pdf-files-orig/*.pdf | grep -E "File:|Status:"
+#+END_SRC
+
+* Technical Details
+
+** PDF Detection Algorithm
+
+1. Opens PDF using pdfplumber
+2. Iterates through each page
+3. Looks for rectangle objects in the page structure
+4. Counts rectangles (proxy for redaction boxes)
+5. Calculates percentage of affected pages
+
+**Limitations**:
+- Only detects vector overlays, not scanned redactions
+- Counts all rectangles, some might not be redactions
+- No color analysis (assumes black redactions)
+
+** PNG Detection Algorithm
+
+1. Loads PNG as grayscale image
+2. Finds pixels below darkness threshold (default: 50)
+3. Creates binary mask of dark regions
+4. Identifies contours (connected dark regions)
+5. Filters contours by size (larger = more likely redactions)
+6. Counts suspicious regions
+
+**Limitations**:
+- Fixed threshold (may miss light redactions or catch shadows)
+- Can't distinguish redaction type (box vs. text vs. line)
+- May have false positives from scanned document artifacts
+
+* Customization
+
+** Change PNG Darkness Threshold
+
+To detect lighter redactions, lower the threshold:
+
+#+BEGIN_SRC python
+# In detect_redactions.py, modify:
+result = detect_redactions_in_png(path, threshold=30)  # 30 instead of 50
+#+END_SRC
+
+** Add to Batch Processing
+
+Integrate into your workflow:
+
+#+BEGIN_SRC bash
+# Step 1: Check which PDFs have vector redactions
+python3 detect_redactions.py ../pdf-files-orig/*.pdf
+
+# Step 2: Extract PNGs from those with vector redactions
+python3 batch_pdf_to_png.py
+
+# Step 3: Verify extraction removed redactions
+python3 detect_redactions.py iran-cia-main.*/page_1.png
+#+END_SRC
+
+* Limitations and Caveats
+
+** What It Can't Detect
+
+- Partially transparent redactions
+- Color-based redactions (red, blue, etc.)
+- Text-based covering (words typed over text)
+- Selective graying/pixelation
+- Redactions in metadata or hidden layers
+
+** False Positives
+
+PNG detection may incorrectly identify as redactions:
+
+- Large dark text blocks
+- Scanned document shadows
+- Low-contrast printing
+- Damaged/worn paper
+- Scanning artifacts
+
+## False Negatives
+
+May miss:
+
+- Very light redactions (faint marks)
+- Partial character obscuring
+- Subtle gray overlays
+- Very small redaction boxes
+
+* Recommendations
+
+1. **Always verify visually** - Tool gives indication, not guarantee
+2. **Use PDF detection first** - More reliable than PNG
+3. **Extract PNGs and recheck** - Verify redactions were removed
+4. **Cross-reference results** - Compare multiple files for patterns
+5. **Document findings** - Record which files have which redaction types
+
+* Summary
+
+The redaction detection tool provides quick, automated classification of documents:
+
+- ✓ Fast detection of vector overlay redactions
+- ✓ Identification of physical/scanned redactions
+- ✓ Statistical information about redaction extent
+- ✓ Batch processing support
+- ⚠ Not 100% accurate - use as guide, not guarantee
+- ⚠ Manual verification recommended for critical work
+
+Use it to:
+1. Classify documents quickly
+2. Identify which need special handling
+3. Verify extraction was successful
+4. Generate redaction statistics
+5. Plan processing workflow

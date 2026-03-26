@@ -1,0 +1,23 @@
+\documentclass[letterpaper]{article}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage[colorlinks=true,linkcolor=blue]{hyperref}
+\pagestyle{plain}
+
+\begin{document}
+
+% --- Cross-reference examples ---
+\noindent
+The introduction  Page 1 opens on \hyperref[img:iran-cia-intro:page_1]{page~\pageref*{img:iran-cia-intro:page_1}}.\\
+The CIA summary  begins on \hyperref[img:iran-cia-summary:page_1]{page~\pageref*{img:iran-cia-summary:page_1}}.\\
+Main section 3 starts on \hyperref[img:iran-cia-main.3:page_1]{page~\pageref*{img:iran-cia-main.3:page_1}}.
+
+\bigskip\noindent
+(All three are explicit \verb|\hyperref[...] {page~\pageref*{...}}|
+links derived directly from the image filenames.)
+
+\clearpage
+
+\input{/bxo/r3/iso/pip_lcnt_mb-mossadeq/cia-53-iranCoup/orig-files-proc/part_tpajax_images_8p5x11_4up.tex}
+\end{document}

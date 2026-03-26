@@ -1,0 +1,289 @@
+#+TITLE: Redaction Identification Tool - Usage Guide
+#+AUTHOR: GitHub Copilot
+#+DATE: February 20, 2026
+
+* Overview
+
+Tools for identifying, marking, and documenting redacted regions in PDF documents. These scripts analyze the PDF structure to locate redaction boxes and create annotated PNG files with CSV reports.
+
+* Files
+
+| Script | Purpose |
+|---|---|
+| =identify_redactions.py= | Identify redactions in single or multiple PDFs |
+| =batch_identify_redactions.py= | Batch process all iran-cia-*.pdf files |
+
+* How It Works
+
+** Process Flow
+
+1. **Extract redaction coordinates** from PDF structure using pdfplumber
+2. **Identify black rectangular boxes** in the PDF's vector objects
+3. **Extract page images** and convert to PNG
+4. **Mark redacted regions** with red boxes and coordinates
+5. **Generate CSV report** with detailed redaction statistics
+
+** Key Insight
+
+The script identifies redactions by looking for BLACK RECTANGLES in the PDF's vector graphics layer. These are the overlay boxes that sit on top of the document image.
+
+* Usage
+
+** Single PDF Analysis
+
+Analyze redactions in one PDF file:
+
+#+BEGIN_SRC bash
+python3 identify_redactions.py inFile.pdf
+#+END_SRC
+
+**Example:**
+
+#+BEGIN_SRC bash
+python3 identify_redactions.py iran-cia-main.7.pdf
+#+END_SRC
+
+**Output:**
+
+#+BEGIN_EXAMPLE
+======================================================================
+REDACTION IDENTIFICATION TOOL
+======================================================================
+
+Processing: iran-cia-main.7.pdf
+Output directory: /path/to/pdfs
+
+Found redactions on 14 page(s)
+
+  ✓ Page   1: 2 redaction box(es),   0.7% of page
+             Saved: iran-cia-main.7_page_1_redactions_marked.png
+  ✓ Page   4: 3 redaction box(es),   4.0% of page
+             Saved: iran-cia-main.7_page_4_redactions_marked.png
+  ✓ Page   6: 2 redaction box(es),   1.0% of page
+             Saved: iran-cia-main.7_page_6_redactions_marked.png
+  ...
+  ✓ Page  20: 3 redaction box(es),   1.3% of page
+             Saved: iran-cia-main.7_page_20_redactions_marked.png
+  Report: iran-cia-main.7_redaction_report.csv
+
+✓ Complete!
+#+END_EXAMPLE
+
+** Multiple PDFs
+
+Analyze redactions in multiple PDFs:
+
+#+BEGIN_SRC bash
+python3 identify_redactions.py iran-cia-main.7.pdf iran-cia-main.8.pdf iran-cia-summary.pdf
+#+END_SRC
+
+** Batch Processing All PDFs
+
+Process all =iran-cia-*.pdf= files in current directory:
+
+#+BEGIN_SRC bash
+python3 batch_identify_redactions.py
+#+END_SRC
+
+Or specify a directory:
+
+#+BEGIN_SRC bash
+python3 batch_identify_redactions.py /path/to/pdf/directory
+#+END_SRC
+
+* Output Files
+
+** Annotated PNG Images
+
+For each page with redactions, an annotated PNG is created:
+
+| File | Content |
+|---|---|
+| =inFile_page_1_redactions_marked.png= | Page 1 with red boxes marking redactions |
+| =inFile_page_4_redactions_marked.png= | Page 4 with red boxes marking redactions |
+| ... | One file per page with redactions |
+
+**Visual Features:**
+- Red rectangle border around each redaction
+- Semi-transparent red fill inside box
+- Text label showing pixel coordinates
+- Multiple boxes per page are all marked
+
+** CSV Report (Per PDF)
+
+Each PDF gets a detailed CSV report:
+
+| File | Content |
+|---|---|
+| =inFile_redaction_report.csv= | Detailed statistics for all redactions |
+
+**Example:**
+
+#+BEGIN_EXAMPLE
+PDF File,Page Number,Redaction Box #,X0 (pixels),Y0 (pixels),X1 (pixels),Y1 (pixels),Width,Height,Area,Percent,Total Boxes,Total %,Image Size,Time
+iran-cia-main.7.pdf,1,1,187,532,270,554,83,22,1826,0.4%,2,0.7%,590x843,2026-02-20T15:19:33
+iran-cia-main.7.pdf,1,2,187,532,270,554,83,22,1826,0.4%,2,0.7%,590x843,2026-02-20T15:19:33
+iran-cia-main.7.pdf,4,1,212,316,365,340,153,24,3672,0.7%,3,4.0%,590x843,2026-02-20T15:19:33
+iran-cia-main.7.pdf,11,1,94,122,542,554,448,432,193536,38.9%,2,39.2%,590x843,2026-02-20T15:19:33
+...
+#+END_EXAMPLE
+
+**Columns:**
+- =PDF File= - Source PDF filename
+- =Page Number= - Page with redaction
+- =Redaction Box #= - Which box on that page (1st, 2nd, 3rd, etc.)
+- =X0, Y0, X1, Y1= - Pixel coordinates of redaction corners
+- =Width, Height= - Dimensions in pixels
+- =Area= - Size in pixels²
+- =Percent of Page Redacted= - What % of this box covers the page
+- =Total Boxes on Page= - How many boxes are on this page
+- =Total Page Redaction %= - Overall % of page that's redacted
+- =Image Size= - Page image dimensions
+- =Processing Time= - When it was processed
+
+** Combined Report (Optional)
+
+If processing multiple PDFs, a combined summary is created:
+
+| File | Content |
+|---|---|
+| =all_redactions_report.csv= | Summary across all PDFs |
+
+* Example Results: iran-cia-main.7.pdf
+
+From analysis of this document:
+
+| Metric | Value |
+|---|---|
+| Total pages | 22 |
+| Pages with redactions | 14 |
+| Total redaction boxes | 45 |
+| Largest redaction | Page 11: 39.2% of page |
+| Smallest redaction | Multiple: 0.2% of page |
+| Average per redacted page | ~3.2 boxes |
+
+**Pages with most redactions:**
+- Page 14: 11 boxes (5.6% of page)
+- Page 11: 2 boxes (39.2% of page) ← Largest single redaction
+- Page 17: 5 boxes (6.5% of page)
+- Page 15: 2 boxes (6.8% of page)
+- Page 13: 5 boxes (2.4% of page)
+
+* Why This Matters
+
+This tool provides:
+
+1. **Visual Documentation** - See exactly what was redacted in each document
+2. **Precise Coordinates** - Know exact pixel locations of redactions
+3. **Redaction Severity** - Understand how much content was hidden
+4. **Searchable Records** - CSV data can be indexed and queried
+5. **Audit Trail** - Document when redactions were identified
+
+* Interpretation Guide
+
+** Reading the Annotated PNGs
+
+When viewing the marked PNG files:
+
+- **Red boxes** = Regions that were redacted in the original PDF
+- **Box size** = How much content was hidden
+- **Number of boxes** = How many separate redactions on that page
+- **Unredacted areas** = Content that was publicly visible
+
+**Important:** The red boxes show where the redactions WERE, not what was hidden. The underlying content is now visible as regular image content.
+
+** Reading the CSV Reports
+
+Use the CSV to:
+
+1. **Find heavily redacted pages** - Sort by "Total Page Redaction %" column
+2. **Identify specific boxes** - Use X0, Y0, X1, Y1 coordinates
+3. **Analyze patterns** - Which pages/documents have most redactions
+4. **Track coverage** - "Area" column shows total hidden pixels
+
+* Requirements
+
+- Python 3.6+
+- =pdfplumber= - PDF structure analysis
+- =Pillow/PIL= - Image processing
+
+Installation:
+
+#+BEGIN_SRC bash
+pip install pdfplumber Pillow
+#+END_SRC
+
+* Workflow Integration
+
+** Complete Processing Pipeline
+
+#+BEGIN_SRC bash
+# Step 1: Identify redactions and create annotations
+python3 batch_identify_redactions.py
+
+# Step 2: Extract all pages to PNG
+python3 batch_pdf_to_png.py
+
+# Step 3: Run OCR on extracted PNGs
+for dir in iran-cia-*/; do
+  for png in "$dir"/*.png; do
+    tesseract "$png" "${png%.png}"
+  done
+done
+
+# Step 4: Analyze results
+ls *_redaction_report.csv
+ls *_redactions_marked.png
+#+END_SRC
+
+* Troubleshooting
+
+** "No redaction boxes detected"
+
+This means the PDF doesn't have any black rectangle objects in the vector layer.
+
+**Possible reasons:**
+- PDF was created with embedded image redactions (not vector overlays)
+- Redactions use different color than black
+- Document has no redactions
+
+**Solution:** Check if redactions are visible in original PDF
+
+** CSV file missing data
+
+Some columns may be empty if:
+- Image size varies between pages
+- Redactions have unusual dimensions
+
+**Solution:** These are still valid entries; null values are acceptable
+
+** Annotated PNG looks wrong
+
+If the red boxes don't align with expected locations:
+
+- PDF coordinates may have been transformed
+- Image scaling might be different
+- Check image size matches
+
+**Solution:** Compare with original PDF page side-by-side
+
+* Performance Notes
+
+- **Per PDF:** ~5-30 seconds (depending on page count and redaction complexity)
+- **Per page:** ~0.2-2 seconds
+- **Batch of 17 PDFs:** ~5-15 minutes
+
+* Summary
+
+The redaction identification tools provide complete documentation of all redacted regions in your PDFs:
+
+| Tool | Input | Output |
+|---|---|---|
+| =identify_redactions.py= | PDF file(s) | PNG files + CSV reports |
+| =batch_identify_redactions.py= | All PDFs | All annotations + reports |
+
+Use these tools to:
+- ✓ Visually mark redacted regions
+- ✓ Document redaction locations
+- ✓ Generate searchable records
+- ✓ Track what was hidden

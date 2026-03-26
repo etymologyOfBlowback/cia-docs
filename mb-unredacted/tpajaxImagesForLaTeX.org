@@ -1,0 +1,121 @@
+#+TITLE: TPAJAX Images for LaTeX - Work Summary
+#+DATE: 2026-03-19
+
+* Overview
+This file documents the Python/LaTeX pipeline for displaying CIA TPAJAX source
+page images in the book. The output is a single 4-up LaTeX include file covering
+210 PNG images from 17 iran-cia-* directories.
+
+* Python Scripts
+
+** generate_tpajax_images_latex.py  (monolithic, kept for reference)
+The original single-script generator.  Still functional.  Default output is
+4-up only.  All changes below have been applied to it.
+
+** iran-cia-images-list.py  (Part 1 — iran-cia specific)
+Scans iran-cia-* directories, applies canonical sort order, and emits a plain
+text file list (one path per line) with the orig-files-proc/ prefix.
+
+Output format example:
+  orig-files-proc/iran-cia-intro/page_1.png
+  orig-files-proc/iran-cia-intro/page_2.png
+  orig-files-proc/iran-cia-summary/page_1.png
+  ...
+
+** images-list-to4up-latex.py  (Part 2 — generic)
+Reads any plain image list (stdin or --input file) and produces a 4-up LaTeX
+include file.  Has no knowledge of iran-cia naming conventions.
+- Derives label from path ending: iran-cia-intro/page_1.png → img:iran-cia-intro:page_1
+- Emits \phantomsection\label{...} before each \includegraphics
+- Writes to stdout or --output file
+
+* Generated LaTeX Files
+- part_tpajax_images_8p5x11_4up.tex — the 4-up include file (210 images, 53 pages)
+  (2-up was eliminated after visual inspection; 2-up .tex deleted)
+
+* Standalone Visual-Inspection Files
+- tpajax_images_8p5x11_4up_main.tex — pdflatex wrapper for visual inspection
+  - includes hyperref with colorlinks=true,linkcolor=blue
+  - page 1 demonstrates three hyperref cross-reference examples
+- Output: tpajax_images_8p5x11_4up_main.pdf (54 pages)
+
+* Design Decisions and Changes Since Initial Version
+
+** 2-up eliminated
+Visual inspection confirmed 4-up is the better layout.  2-up .tex deleted.
+All scripts now default to 4-up.
+
+** orig-files-proc symlink convention
+Image paths in generated LaTeX use orig-files-proc/ as the prefix, not
+absolute paths.  Any consumer location must have a symlink named orig-files-proc
+pointing to this directory.  This makes the generated .tex file portable.
+
+** Per-image labels with \phantomsection
+Each image cell emits:
+  \phantomsection\label{img:<section>:<stem>}%
+  \includegraphics[...]{orig-files-proc/<section>/<stem>.png}
+
+Label key is derived directly from the filename — no counters needed.
+\phantomsection is required for hyperref to create a fresh anchor at each image
+location; without it all links pointed to Doc-Start (document beginning).
+
+** hyperref for clickable page references
+The standalone wrapper (and final book preamble) should load:
+  \usepackage[colorlinks=true,linkcolor=blue]{hyperref}
+
+Cross-reference pattern for body text:
+  \hyperref[img:iran-cia-intro:page_1]{page~\pageref*{img:iran-cia-intro:page_1}}
+
+This displays "page N" as a colored, clickable link that jumps to the correct
+image location.  Plain \ref does not work (no counter value); use \pageref only.
+
+** Split generator design
+Part 1 (iran-cia-images-list.py) and Part 2 (images-list-to4up-latex.py) allow
+Part 2 to be reused for other projects by feeding it a different image list.
+The two parts produce output identical to the monolithic generator.
+
+* Current File Inventory
+#+BEGIN_EXAMPLE
+generate_tpajax_images_latex.py     — original monolithic generator (kept)
+iran-cia-images-list.py             — Part 1: iran-cia image lister
+images-list-to4up-latex.py          — Part 2: generic 4-up LaTeX generator
+part_tpajax_images_8p5x11_4up.tex   — generated LaTeX include (4-up)
+tpajax_images_8p5x11_4up_main.tex   — standalone inspection wrapper
+tpajax_images_8p5x11_4up_main.pdf   — inspection PDF (54 pages)
+orig-files-proc                     — symlink pointing to this directory
+#+END_EXAMPLE
+
+* Commands Used (Copy/Paste)
+
+** Generate 4-up include file (monolithic generator)
+#+BEGIN_SRC bash
+cd /bxo/r3/iso/pip_lcnt_mb-mossadeq/cia-53-iranCoup/orig-files-proc
+python3 generate_tpajax_images_latex.py
+#+END_SRC
+
+** Generate 4-up include file (two-part pipeline)
+#+BEGIN_SRC bash
+cd /bxo/r3/iso/pip_lcnt_mb-mossadeq/cia-53-iranCoup/orig-files-proc
+python3 iran-cia-images-list.py | python3 images-list-to4up-latex.py \
+  --output part_tpajax_images_8p5x11_4up.tex
+#+END_SRC
+
+** Write image list to file (inspect or debug)
+#+BEGIN_SRC bash
+cd /bxo/r3/iso/pip_lcnt_mb-mossadeq/cia-53-iranCoup/orig-files-proc
+python3 iran-cia-images-list.py --output /tmp/iran-cia-image-list.txt
+#+END_SRC
+
+** Build 4-up standalone inspection PDF (two passes for stable refs)
+#+BEGIN_SRC bash
+cd /bxo/r3/iso/pip_lcnt_mb-mossadeq/cia-53-iranCoup/orig-files-proc
+pdflatex -interaction=nonstopmode -halt-on-error tpajax_images_8p5x11_4up_main.tex
+pdflatex -interaction=nonstopmode -halt-on-error tpajax_images_8p5x11_4up_main.tex
+#+END_SRC
+
+** Cross-reference pattern for body text (use in book .tex files)
+#+BEGIN_SRC latex
+\hyperref[img:iran-cia-intro:page_1]{page~\pageref*{img:iran-cia-intro:page_1}}
+\hyperref[img:iran-cia-summary:page_1]{page~\pageref*{img:iran-cia-summary:page_1}}
+\hyperref[img:iran-cia-main.3:page_1]{page~\pageref*{img:iran-cia-main.3:page_1}}
+#+END_SRC
