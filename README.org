@@ -1,0 +1,30 @@
+#+title: Operation TPAJAX 1953 CIA Documents
+#+DATE: <2026-03-28 Sat 22:41>
+#+AUTHOR: Mohsen BANAN
+#+OPTIONS: toc:4
+
+* Overview
+
+These are the New York Times Published Documents, before and after redactions.
+
+* Table of Contents     :TOC:
+- [[#overview][Overview]]
+- [[#nyt-20000616][nyt-20000616]]
+- [[#nyt-after][nyt-after]]
+- [[#mb-unredacted][mb-unredacted]]
+
+* nyt-20000616
+
+First set of botched redactions as published by NYT on June 16th, 2000.
+
+* nyt-after
+
+Second set of documents published by NYT about a month after the first publication.
+
+* mb-unredacted
+
+Same as nyt-20000616 but unredacted for botched redactions.
+
+# Local Variables:
+# eval: (setq-local toc-org-max-depth 4)
+# End:
